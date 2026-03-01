@@ -5,11 +5,12 @@ import { clerkMiddleware, clerkClient, requireAuth, getAuth } from '@clerk/expre
 
 
 
+
 const app = express()
+app.use(cors({origin:ENV.FRONTEND_URL}))// Enable CORS for all routes
 app.use(clerkMiddleware())// Adds Clerk authentication state and methods to the request object
 app.use(express.json()) //parse JSON bodies (as sent by API clients)    
 app.use(express.urlencoded({extended:true}))//parse urlencoded bodies (like HTML form submits)
-app.use(cors({origin:ENV.FRONTEND_URL}))// Enable CORS for all routes
 
 
 
