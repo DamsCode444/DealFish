@@ -1,8 +1,11 @@
 import express from "express";
 import { ENV } from "./config/env";
 import cors from "cors";
-import { clerkMiddleware, clerkClient, requireAuth, getAuth } from '@clerk/express'
+import { clerkMiddleware } from '@clerk/express'
 
+import userRoutes from "./routes/userRoutes";
+import productRoutes from "./routes/productRoutes";
+import commentRoutes from "./routes/commentRoutes";
 
 
 
@@ -20,7 +23,9 @@ app.get("/",(req,res)=>
     })
 
 
-   
+app.use("/api/users",userRoutes)
+app.use("/api/product",productRoutes)
+app.use("/api/comments",commentRoutes)
 
 
 
