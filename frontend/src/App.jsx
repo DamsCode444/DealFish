@@ -6,8 +6,16 @@ import  ProfilePage  from './pages/ProfilePage'
 import  CreatePage  from './pages/CreatePage'
 import  EditProductPage  from './pages/EditProductPage'
 import  {Routes, Route } from 'react-router'
+import useAuthReq from './hooks/useAuthReq'
+import useUserSync from './hooks/useUserSync'
 
 function App() {
+  const { isSignedIn, isClerkLoaded } = useAuthReq();
+  useUserSync();
+  if (!isClerkLoaded) {
+    return <div>Loading...</div>;
+  }
+
   return (
   <div className='min-h-screen bg-base-100'>
     <Navbar />

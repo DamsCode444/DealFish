@@ -1,32 +1,46 @@
 import express from "express";
 import { ENV } from "./config/env";
 import cors from "cors";
-import { clerkMiddleware } from '@clerk/express'
+import { clerkMiddleware } from '@clerk/express';
 
 import userRoutes from "./routes/userRoutes";
 import productRoutes from "./routes/productRoutes";
 import commentRoutes from "./routes/commentRoutes";
 
+const app = express();
 
+const corsOptions = {
+  origin: ENV.FRONTEND_URL || "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true,
+};
 
-const app = express()
-app.use(cors({origin:ENV.FRONTEND_URL}))// Enable CORS for all routes
-app.use(clerkMiddleware())// Adds Clerk authentication state and methods to the request object
-app.use(express.json()) //parse JSON bodies (as sent by API clients)    
-app.use(express.urlencoded({extended:true}))//parse urlencoded bodies (like HTML form submits)
+// Apply CORS globally (this attaches the CORS response headers)
+app.use(cors(corsOptions));
 
+// Optional: explicitly handle preflight after cors middleware so headers are present
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    // cors() already added the required headers, so respond
+    return res.sendStatus(204);
+  }
+  next();
+});
 
+// Body parsers
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/",(req,res)=>
-    {
-        res.json({success:true,message:"Welcome to Productify API"})
-    })
+// Clerk middleware after CORS
+app.use(clerkMiddleware());
 
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "Welcome to Productify API" });
+});
 
-app.use("/api/users",userRoutes)
-app.use("/api/product",productRoutes)
-app.use("/api/comments",commentRoutes)
+app.use("/api/users", userRoutes);
+app.use("/api/product", productRoutes);
+app.use("/api/comments", commentRoutes);
 
-
-
-app.listen(ENV.PORT,()=> console.log("Server is running on port "+ENV.PORT))
+app.listen(ENV.PORT, () => console.log("Server is running on port " + ENV.PORT));
