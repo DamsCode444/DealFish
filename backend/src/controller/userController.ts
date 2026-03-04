@@ -17,7 +17,6 @@ export async function syncUser(req:Request,res:Response){
             id:userId,
             email,
             name,
-            passwordHash:"",
             imageUrl
         })
         res.status(200).json({success:true,message:"User synced successfully",data:user})
