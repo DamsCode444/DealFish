@@ -2,3 +2,6 @@
 @plugin "daisyui" {
   themes: all;
 }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
