@@ -8,32 +8,32 @@ export const syncUser = async (userData) => {
 
 // Products API
 export const getAllProducts = async () => {
-  const { data } = await api.get("/products");
+  const { data } = await api.get("/product");
   return data;
 };
 
 export const getProductById = async (id) => {
-  const { data } = await api.get(`/products/${id}`);
+  const { data } = await api.get(`/product/${id}`);
   return data;
 };
 
 export const getMyProducts = async () => {
-  const { data } = await api.get("/products/my");
+  const { data } = await api.get("/product/my");
   return data;
 };
 
 export const createProduct = async (productData) => {
-  const { data } = await api.post("/products", productData);
+  const { data } = await api.post("/product", productData);
   return data;
 };
 
 export const updateProduct = async ({ id, ...productData }) => {
-  const { data } = await api.put(`/products/${id}`, productData);
+  const { data } = await api.put(`/product/${id}`, productData);
   return data;
 };
 
 export const deleteProduct = async (id) => {
-  const { data } = await api.delete(`/products/${id}`);
+  const { data } = await api.delete(`/product/${id}`);
   return data;
 };
 

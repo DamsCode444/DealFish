@@ -15,9 +15,10 @@ export const products = pgTable("products",{
     title:text("title").notNull(),
     description:text("description").notNull(),
     imageUrl: text("image_url"),
+    price: text("price").notNull(),
     userId:text("user_id").notNull().references(()=>users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at" , {mode:"date"}).notNull().defaultNow(),
-    updateAt: timestamp("updated_at" , {mode:"date"}).notNull().defaultNow(),       
+    updatedAt: timestamp("updated_at" , {mode:"date"}).notNull().defaultNow(),       
 })
 
 export const comments = pgTable("comments",{
@@ -26,7 +27,7 @@ export const comments = pgTable("comments",{
     userId:text("user_id").notNull().references(()=>users.id, { onDelete: "cascade" }),
     productId:uuid("product_id").notNull().references(()=>products.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at" , {mode:"date"}).notNull().defaultNow(),
-    updateAt: timestamp("updated_at" , {mode:"date"}).notNull().defaultNow(),       
+    updatedAt: timestamp("updated_at" , {mode:"date"}).notNull().defaultNow(),       
 })
 
 //Relations defines how tables are related to each other, it is used to generate the correct SQL queries when we want to fetch related data.
@@ -43,6 +44,11 @@ export const productsRelations = relations(products, ({one,many})=>({
     comments: many(comments), //one product can have many comments
 }))
 
+// Add this missing relation
+export const commentsRelations = relations(comments, ({ one }) => ({
+  product: one(products, { fields: [comments.productId], references: [products.id] }),
+  user: one(users, { fields: [comments.userId], references: [users.id] }),
+}));
 
 //InferSelect is a utility type provided by Drizzle ORM that infers the TypeScript type of the selected data based on the table definition. 
 // It allows us to get the correct types for our queries without having to manually define them.
