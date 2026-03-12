@@ -1,0 +1,21 @@
+{
+  "name": "productify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix backend && npm run build --prefix frontend",
+    "start": "npm run db:push --prefix backend && npm start --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DamsCode444/DealFish.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DamsCode444/DealFish/issues"
+  },
+  "homepage": "https://github.com/DamsCode444/DealFish#readme"
+}
