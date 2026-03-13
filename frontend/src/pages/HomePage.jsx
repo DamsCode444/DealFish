@@ -8,7 +8,7 @@ import { SignInButton } from "@clerk/clerk-react";
 
 function HomePage() {
   const { data: products, isLoading, error } = useProducts();
- 
+
   if (isLoading) return <HomePageSkeleton />;
 
   if (error) {
@@ -37,7 +37,7 @@ function HomePage() {
               Share Your <span className="text-primary">Products</span>
             </h1>
             <p className="py-4 text-base-content/60">
-              Upload, discover, and connect with creators. 
+              Upload, discover, and connect with creators.
             </p>
             <SignInButton mode="modal">
               <button className="btn btn-primary">

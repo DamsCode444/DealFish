@@ -1,14 +1,65 @@
-import { ArrowLeftIcon, ImageIcon, TypeIcon, FileTextIcon, SaveIcon } from "lucide-react";
+import { ArrowLeftIcon, FileTextIcon, ImageIcon, SaveIcon, XIcon, TypeIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { useUploadImages } from "../hooks/useProducts";
 
 function EditProductForm({ product, isPending, isError, onSubmit }) {
+  const uploadImages = useUploadImages();
+
   const [formData, setFormData] = useState({
     title: product.title,
     description: product.description,
-    imageUrl: product.imageUrl,
     price: product.price,
   });
+
+  const [existingImages, setExistingImages] = useState<string[]>(product.imageUrls || []);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [newPreviews, setNewPreviews] = useState<string[]>([]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setNewFiles((prev) => [...prev, ...filesArray]);
+
+      const previewsArray = filesArray.map((file) => URL.createObjectURL(file));
+      setNewPreviews((prev) => [...prev, ...previewsArray]);
+    }
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewImage = (index: number) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+    setNewPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (existingImages.length === 0 && newFiles.length === 0) {
+      alert("Please have at least one image");
+      return;
+    }
+
+    try {
+      let uploadedUrls: string[] = [];
+      if (newFiles.length > 0) {
+        const uploadData = new FormData();
+        newFiles.forEach((file) => uploadData.append("images", file));
+
+        const uploadResult = await uploadImages.mutateAsync(uploadData);
+        uploadedUrls = uploadResult.data;
+      }
+
+      const allImageUrls = [...existingImages, ...uploadedUrls];
+      onSubmit({ ...formData, imageUrls: allImageUrls });
+    } catch (error) {
+      console.error("Error uploading new images:", error);
+    }
+  };
+
+  const isFormPending = isPending || uploadImages.isPending;
 
   return (
     <div className="max-w-lg mx-auto">
@@ -23,13 +74,7 @@ function EditProductForm({ product, isPending, isError, onSubmit }) {
             Edit Product
           </h1>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(formData);
-            }}
-            className="space-y-4 mt-4"
-          >
+          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <label className="input input-bordered flex items-center gap-2 bg-base-200">
               <TypeIcon className="size-4 text-base-content/50" />
               <input
@@ -42,26 +87,60 @@ function EditProductForm({ product, isPending, isError, onSubmit }) {
               />
             </label>
 
-            <label className="input input-bordered flex items-center gap-2 bg-base-200">
-              <ImageIcon className="size-4 text-base-content/50" />
-              <input
-                type="url"
-                placeholder="Image URL"
-                className="grow"
-                value={formData.imageUrl}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                required
-              />
-            </label>
-
-            {formData.imageUrl && (
-              <div className="rounded-box overflow-hidden">
-                <img
-                  src={formData.imageUrl}
-                  alt="Preview"
-                  className="w-full h-40 object-cover"
-                  onError={(e) => (e.currentTarget.style.display = "none")}
+            {/* IMAGES INPUT */}
+            <div className="form-control">
+              <label className="label cursor-pointer justify-start gap-2 bg-base-200 p-3 rounded-box border border-base-300">
+                <ImageIcon className="size-4 text-base-content/50" />
+                <span className="label-text">Select New Images</span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
                 />
+              </label>
+            </div>
+
+            {/* EXISTING IMAGES */}
+            {existingImages.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-xs text-base-content/50 ml-1">Existing Images</span>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {existingImages.map((src, idx) => (
+                    <div key={idx} className="relative rounded-box overflow-hidden group">
+                      <img src={src} alt="Existing" className="w-full h-24 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(idx)}
+                        className="absolute top-1 right-1 btn btn-xs btn-circle btn-error opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <XIcon className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* NEW IMAGES PREVIEW */}
+            {newPreviews.length > 0 && (
+              <div className="space-y-2 mt-2">
+                <span className="text-xs text-base-content/50 ml-1">New Images</span>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {newPreviews.map((src, idx) => (
+                    <div key={idx} className="relative rounded-box overflow-hidden group">
+                      <img src={src} alt="New preview" className="w-full h-24 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeNewImage(idx)}
+                        className="absolute top-1 right-1 btn btn-xs btn-circle btn-error opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <XIcon className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -77,6 +156,7 @@ function EditProductForm({ product, isPending, isError, onSubmit }) {
                 />
               </div>
             </div>
+
             <label className="input input-bordered flex items-center gap-2 bg-base-200">
               <span className="text-base-content/50">¥</span>
               <input
@@ -91,14 +171,14 @@ function EditProductForm({ product, isPending, isError, onSubmit }) {
               />
             </label>
 
-            {isError && (
+            {(isError || uploadImages.isError) && (
               <div role="alert" className="alert alert-error alert-sm">
                 <span>Failed to update. Try again.</span>
               </div>
             )}
 
-            <button type="submit" className="btn btn-primary w-full" disabled={isPending}>
-              {isPending ? <span className="loading loading-spinner" /> : "Save Changes"}
+            <button type="submit" className="btn btn-primary w-full" disabled={isFormPending}>
+              {isFormPending ? <span className="loading loading-spinner" /> : "Save Changes"}
             </button>
           </form>
         </div>

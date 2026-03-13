@@ -27,6 +27,13 @@ export const createProduct = async (productData) => {
   return data;
 };
 
+export const uploadImages = async (formData) => {
+  const { data } = await api.post("/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+
 export const updateProduct = async ({ id, ...productData }) => {
   const { data } = await api.put(`/product/${id}`, productData);
   return data;

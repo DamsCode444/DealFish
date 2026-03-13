@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
     >
       <figure className="px-4 pt-4">
         <img
-          src={product.imageUrl}
+          src={product.imageUrls?.[0] || ""}
           alt={product.title}
           className="rounded-xl h-40 w-full object-cover"
         />
