@@ -3,9 +3,13 @@ import { ENV } from "./config/env";
 import cors from "cors";
 import { clerkMiddleware } from '@clerk/express';
 import path from "path";
+import { fileURLToPath } from "url";
 import userRoutes from "./routes/userRoutes";
 import productRoutes from "./routes/productRoutes";
 import commentRoutes from "./routes/commentRoutes";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -43,11 +47,13 @@ app.use("/api/users", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/comments", commentRoutes);
 
-if (ENV.NODE_ENV === "production") {
-  const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.get("/{*any}", (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+// Serve frontend in production
+const nodeEnv = ENV.NODE_ENV || process.env.NODE_ENV || "development";
+if (nodeEnv === "production") {
+  const frontendDistPath = path.join(__dirname, "../../frontend/dist");
+  app.use(express.static(frontendDistPath));
+  app.get("*", (req: Request, res: Response) => {
+    res.sendFile(path.join(frontendDistPath, "index.html"));
   });
 }
 
