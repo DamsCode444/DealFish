@@ -3,3 +3,6 @@ node_modules
 dist
 .DS_Store
 backend/node_modules/
+DOCUMENTATION.md
+README.md
+
