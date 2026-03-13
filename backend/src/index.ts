@@ -10,7 +10,7 @@ import commentRoutes from "./routes/commentRoutes";
 const app = express();
 
 const corsOptions = {
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = [
       "http://localhost:5173",
       "http://localhost:3000",
