@@ -1,4 +1,3 @@
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 import Navbar from './components/Navbar'
 import  HomePage  from './pages/HomePage'
 import  ProductPage  from './pages/ProductPage'

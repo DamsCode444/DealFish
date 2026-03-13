@@ -63,6 +63,10 @@ if (nodeEnv === "production") {
   app.use(express.static(frontendDistPath));
   // Fallback to index.html for SPA routing (must be after static middleware)
   app.use((req: Request, res: Response) => {
+    // Don't serve index.html for API routes — let them 404 with JSON
+    if (req.path.startsWith("/api")) {
+      return res.status(404).json({ success: false, message: "API endpoint not found" });
+    }
     res.sendFile(path.join(frontendDistPath, "index.html"));
   });
 }
