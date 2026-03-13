@@ -10,7 +10,20 @@ import commentRoutes from "./routes/commentRoutes";
 const app = express();
 
 const corsOptions = {
-  origin: ENV.FRONTEND_URL || "http://localhost:5173",
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://dealfish.onrender.com",
+      ENV.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true,
