@@ -25,12 +25,12 @@ router.post("/", upload.array("images", 5), async (req: Request, res: Response) 
     const { userId } = getAuth(req);
     if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const files = req.files as Express.Multer.File[];
+    const files = req.files as any[] | undefined;
     if (!files || files.length === 0) {
       return res.status(400).json({ success: false, message: "No files uploaded" });
     }
 
-    const uploadPromises = files.map((file) => {
+    const uploadPromises = (files as any[]).map((file: any) => {
       return new Promise<string>((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { folder: "productify" },
