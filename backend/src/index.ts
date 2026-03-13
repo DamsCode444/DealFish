@@ -48,7 +48,8 @@ const nodeEnv = ENV.NODE_ENV || process.env.NODE_ENV || "development";
 if (nodeEnv === "production") {
   const frontendDistPath = path.join(__dirname, "..", "..", "frontend", "dist");
   app.use(express.static(frontendDistPath));
-  app.get("*", (req: Request, res: Response) => {
+  // Fallback to index.html for SPA routing (must be after static middleware)
+  app.use((req: Request, res: Response) => {
     res.sendFile(path.join(frontendDistPath, "index.html"));
   });
 }
