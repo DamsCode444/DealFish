@@ -1,14 +1,16 @@
-import { ArrowLeftIcon, EditIcon, Trash2Icon, CalendarIcon, UserIcon } from "lucide-react";
+import { ArrowLeftIcon, EditIcon, Trash2Icon, CalendarIcon, UserIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import CommentsSection from "../components/CommentsSection";
 import { useAuth } from "@clerk/clerk-react";
 import { useProduct, useDeleteProduct } from "../hooks/useProducts";
 import { useParams, Link, useNavigate } from "react-router";
+import { useState } from "react";
 
 function ProductPage() {
   const { id } = useParams();
   const { userId } = useAuth();
   const navigate = useNavigate();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { data: product, isLoading, error } = useProduct(id);
   const deleteProduct = useDeleteProduct();
@@ -64,14 +66,50 @@ function ProductPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Image */}
+        {/* Image Gallery */}
         <div className="card bg-base-300">
-          <figure className="p-4">
-            <img
-              src={product.imageUrl}
-              alt={product.title}
-              className="rounded-xl w-full h-80 object-cover"
-            />
+          <figure className="p-4 relative">
+            {product.imageUrls && product.imageUrls.length > 0 ? (
+              <>
+                <img
+                  src={product.imageUrls[currentImageIndex]}
+                  alt={`${product.title} - Image ${currentImageIndex + 1}`}
+                  className="rounded-xl w-full h-80 object-cover"
+                />
+                {product.imageUrls.length > 1 && (
+                  <div className="absolute flex justify-between transform -translate-y-1/2 left-6 right-6 top-1/2">
+                    <button 
+                      onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? product.imageUrls.length - 1 : prev - 1))}
+                      className="btn btn-circle btn-sm bg-base-100/80 border-none hover:bg-base-100"
+                    >
+                      <ChevronLeftIcon className="size-4" />
+                    </button>
+                    <button 
+                      onClick={() => setCurrentImageIndex((prev) => (prev === product.imageUrls.length - 1 ? 0 : prev + 1))}
+                      className="btn btn-circle btn-sm bg-base-100/80 border-none hover:bg-base-100"
+                    >
+                      <ChevronRightIcon className="size-4" />
+                    </button>
+                  </div>
+                )}
+                
+                {/* Thumbnails indicator */}
+                {product.imageUrls.length > 1 && (
+                  <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+                    {product.imageUrls.map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`size-2 rounded-full ${i === currentImageIndex ? 'bg-primary' : 'bg-base-content/30'}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+                <div className="rounded-xl w-full h-80 bg-base-200 flex items-center justify-center text-base-content/50">
+                  No images available
+                </div>
+            )}
           </figure>
         </div>
 

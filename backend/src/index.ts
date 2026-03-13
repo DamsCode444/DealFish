@@ -6,6 +6,7 @@ import path from "path";
 import userRoutes from "./routes/userRoutes";
 import productRoutes from "./routes/productRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import uploadRoutes from "./routes/uploadRoutes";
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 app.use("/api/users", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Serve frontend in production
 const nodeEnv = ENV.NODE_ENV || process.env.NODE_ENV || "development";

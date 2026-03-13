@@ -6,6 +6,7 @@ import {
   getMyProducts,
   getProductById,
   updateProduct,
+  uploadImages,
 } from "../lib/api";
 
 export const useProducts = () => {
@@ -19,6 +20,10 @@ export const useProducts = () => {
 
 export const useCreateProduct = () => {
   return useMutation({ mutationFn: createProduct });
+};
+
+export const useUploadImages = () => {
+  return useMutation({ mutationFn: uploadImages });
 };
 
 export const useProduct = (id) => {

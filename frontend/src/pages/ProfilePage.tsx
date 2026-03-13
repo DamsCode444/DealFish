@@ -51,7 +51,7 @@ const ProfilePage = () => {
           {products.map((product) => (
             <div key={product.id} className="card card-side bg-base-300">
               <figure className="w-32 shrink-0">
-                <img src={product.imageUrl} alt={product.title} className="h-full object-cover" />
+                <img src={product.imageUrls?.[0] || ""} alt={product.title} className="h-full object-cover" />
               </figure>
               <div className="card-body p-4">
                 <h2 className="card-title text-base">{product.title}</h2>
