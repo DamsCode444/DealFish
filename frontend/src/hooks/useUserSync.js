@@ -7,7 +7,7 @@ import { syncUser } from "../lib/api";
 function useUserSync() {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  console.log("User data from Clerk:", user);
+  // console.log("User data from Clerk:", user);
 
   const { mutate: syncUserMutation, isPending, isSuccess } = useMutation({ mutationFn: syncUser });
 

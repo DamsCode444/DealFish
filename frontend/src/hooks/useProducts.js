@@ -10,7 +10,7 @@ import {
 
 export const useProducts = () => {
   const result = useQuery({ queryKey: ["products"], queryFn: getAllProducts });
-  console.log("useProducts ->", { products: result.data });
+  // console.log("useProducts ->", { products: result.data });
       return {
     ...result,
     data: result.data?.data || [],
@@ -27,7 +27,7 @@ export const useProduct = (id) => {
     queryFn: () => getProductById(id),
     enabled: !!id,
   });
-  console.log("useProduct ->", { product: result.data });
+  // console.log("useProduct ->", { product: result.data });
   return {
     ...result,
     data: result.data?.data || null,
