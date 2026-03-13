@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { ENV } from "./config/env";
 import cors from "cors";
 import { clerkMiddleware } from '@clerk/express';
@@ -20,7 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Optional: explicitly handle preflight after cors middleware so headers are present
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.method === "OPTIONS") {
     // cors() already added the required headers, so respond
     return res.sendStatus(204);
@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 // Clerk middleware after CORS
 app.use(clerkMiddleware());
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (req: Request, res: Response) => {
   res.json({ success: true, message: "Welcome to Productify API" });
 });
 
@@ -46,7 +46,7 @@ app.use("/api/comments", commentRoutes);
 if (ENV.NODE_ENV === "production") {
   const __dirname = path.resolve();
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.get("/{*any}", (req, res) => {
+  app.get("/{*any}", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
   });
 }
