@@ -12,9 +12,20 @@ function HomePage() {
   if (isLoading) return <HomePageSkeleton />;
 
   if (error) {
+    console.error("HomePage Error:", error);
     return (
       <div role="alert" className="alert alert-error">
-        <span>Something went wrong. Please refresh the page.</span>
+        <span>Something went wrong fetching products. Please check your connection and refresh.</span>
+      </div>
+    );
+  }
+
+  // Defensive check for products array
+  if (!Array.isArray(products)) {
+    console.error("Products is not an array:", products);
+    return (
+      <div role="alert" className="alert alert-warning">
+        <span>Unable to load product list. Please try again later.</span>
       </div>
     );
   }

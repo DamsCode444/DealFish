@@ -8,6 +8,7 @@ import  {Routes, Route, Navigate } from 'react-router'
 import useAuthReq from './hooks/useAuthReq'
 import useUserSync from './hooks/useUserSync'
 import LoadingSpinner from "./components/LoadingSpinner";
+import ErrorBoundary from './components/ErrorBoundary';
 
 
 function App() {
@@ -18,7 +19,8 @@ function App() {
   }
 
   return (
-  <div className='min-h-screen bg-base-100'>
+    <ErrorBoundary>
+      <div className='min-h-screen bg-base-100'>
     <Navbar />
     <main className='max-w-5xl mx-auto px-4 py-8'>
         <Routes>
@@ -32,7 +34,8 @@ function App() {
           <Route path="/edit/:id" element={<EditProductPage />} />
         </Routes>
     </main>
-  </div>
+      </div>
+    </ErrorBoundary>
   )
 }
 
