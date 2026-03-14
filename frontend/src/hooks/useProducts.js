@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
 
 import {
   createProduct,
@@ -14,13 +13,10 @@ import {
 export const useProducts = () => {
   const result = useQuery({ queryKey: ["products"], queryFn: getAllProducts });
 
-  return useMemo(
-    () => ({
-      ...result,
-      data: result.data?.data || [],
-    }),
-    [result]
-  );
+  return {
+    ...result,
+    data: result.data?.data || [],
+  };
 };
 
 export const useCreateProduct = () => {
@@ -38,13 +34,10 @@ export const useProduct = (id) => {
     enabled: !!id,
   });
 
-  return useMemo(
-    () => ({
-      ...result,
-      data: result.data?.data || null,
-    }),
-    [result]
-  );
+  return {
+    ...result,
+    data: result.data?.data || null,
+  };
 };
 
 export const useDeleteProduct = () => {
@@ -61,13 +54,10 @@ export const useDeleteProduct = () => {
 export const useMyProducts = () => {
   const result = useQuery({ queryKey: ["myProducts"], queryFn: getMyProducts });
 
-  return useMemo(
-    () => ({
-      ...result,
-      data: result.data?.data || [],
-    }),
-    [result]
-  );
+  return {
+    ...result,
+    data: result.data?.data || [],
+  };
 };
 
 export const useUpdateProduct = () => {

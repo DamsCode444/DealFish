@@ -30,6 +30,12 @@ const corsOptions = {
   credentials: true,
 };
 
+// Request logging middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Apply CORS globally (this attaches the CORS response headers)
 app.use(cors(corsOptions));
 
@@ -54,6 +60,8 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/users", userRoutes);
+// Alias both /api/product and /api/products for robustness
+app.use("/api/product", productRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/upload", uploadRoutes);
