@@ -22,14 +22,13 @@ function HomePage() {
   return (
     <div className="space-y-10">
       {/* HERO */}
-      <div className="hero bg-linear-to-br from-base-300 via-base-200 to-base-300 rounded-box overflow-hidden">
+      <div className="hero bg-base-200 rounded-box overflow-hidden">
         <div className="hero-content flex-col lg:flex-row-reverse gap-10 py-10">
           <div className="relative">
-            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-110" />
             <img
               src="/image.png"
               alt="Creator"
-              className="relative h-64 lg:h-72 rounded-2xl shadow-2xl"
+              className="relative h-64 lg:h-72 rounded-2xl shadow-xl"
             />
           </div>
           <div className="text-center lg:text-left">

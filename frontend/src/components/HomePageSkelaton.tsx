@@ -1,16 +1,6 @@
 import { useEffect, useState } from "react";
 
 const HomePageSkeleton = () => {
-  const [show, setShow] = useState(false);
-
-  // Optional: Delay showing to avoid flash on fast loads
-  useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 150);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!show) return null;
-
   return (
     <div
       role="status"
