@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { eq } from "drizzle-orm";
+import { eq, ilike, or } from "drizzle-orm";
 
 import { users,products,comments,type NewComment,type NewUser,type NewProduct } from "./schema";
 
@@ -52,6 +52,17 @@ export const getAllProducts = async () => {
         with:{user:true},
         orderBy: (products, {desc})=>[desc(products.createdAt)]//desc means descending order, so the most recently created products will be returned first.
         //square brackets are used to return an array of products, even if there is only one product that matches the query.
+    });
+}
+
+export const searchProducts = async (query: string) => {
+    return db.query.products.findMany({
+        where: or(
+            ilike(products.title, `%${query}%`),
+            ilike(products.description, `%${query}%`)
+        ),
+        with: { user: true },
+        orderBy: (products, { desc }) => [desc(products.createdAt)]
     });
 }
 
