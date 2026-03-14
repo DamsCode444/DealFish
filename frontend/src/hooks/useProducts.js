@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+
 import {
   createProduct,
   deleteProduct,
@@ -11,11 +13,14 @@ import {
 
 export const useProducts = () => {
   const result = useQuery({ queryKey: ["products"], queryFn: getAllProducts });
-  // console.log("useProducts ->", { products: result.data });
-      return {
-    ...result,
-    data: result.data?.data || [],
-    };
+
+  return useMemo(
+    () => ({
+      ...result,
+      data: result.data?.data || [],
+    }),
+    [result]
+  );
 };
 
 export const useCreateProduct = () => {
@@ -32,11 +37,14 @@ export const useProduct = (id) => {
     queryFn: () => getProductById(id),
     enabled: !!id,
   });
-  // console.log("useProduct ->", { product: result.data });
-  return {
-    ...result,
-    data: result.data?.data || null,
-  };
+
+  return useMemo(
+    () => ({
+      ...result,
+      data: result.data?.data || null,
+    }),
+    [result]
+  );
 };
 
 export const useDeleteProduct = () => {
@@ -52,10 +60,14 @@ export const useDeleteProduct = () => {
 
 export const useMyProducts = () => {
   const result = useQuery({ queryKey: ["myProducts"], queryFn: getMyProducts });
-  return {
-    ...result,
-    data: result.data?.data || [],
-  };
+
+  return useMemo(
+    () => ({
+      ...result,
+      data: result.data?.data || [],
+    }),
+    [result]
+  );
 };
 
 export const useUpdateProduct = () => {

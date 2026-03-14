@@ -9,17 +9,19 @@ function useUserSync() {
   const { user } = useUser();
   // console.log("User data from Clerk:", user);
 
-  const { mutate: syncUserMutation, isPending, isSuccess } = useMutation({ mutationFn: syncUser });
+  const { mutate: syncUserMutation, isPending, isSuccess, isError } = useMutation({ mutationFn: syncUser });
+  // console.log("useUserSync status:", { isPending, isSuccess, isError });
 
   useEffect(() => {
-    if (isSignedIn && user && !isPending && !isSuccess) {
+    if (isSignedIn && user && !isPending && !isSuccess && !isError) {
       syncUserMutation({
         email: user.primaryEmailAddress?.emailAddress,
         name: user.fullName || user.firstName,
         imageUrl: user.imageUrl,
       });
     }
-  }, [isSignedIn, user, syncUserMutation, isPending, isSuccess]);
+  }, [isSignedIn, user, syncUserMutation, isPending, isSuccess, isError]);
+
 
   return { isSynced: isSuccess };
 }

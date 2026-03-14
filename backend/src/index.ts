@@ -54,7 +54,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/users", userRoutes);
-app.use("/api/product", productRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/upload", uploadRoutes);
 
