@@ -19,7 +19,12 @@ function HomePage() {
             <span>Something went wrong fetching products.</span>
             <button 
                 className="btn btn-xs btn-outline"
-                onClick={() => alert(`Error: ${error.message}\nStatus: ${error.response?.status}\nURL: ${error.config?.url}`)}
+                onClick={() => {
+                    const fullUrl = error.config?.baseURL 
+                        ? (error.config.baseURL.replace(/\/$/, '') + '/' + error.config.url.replace(/^\//, ''))
+                        : error.config?.url;
+                    alert(`Error: ${error.message}\nStatus: ${error.response?.status}\nURL: ${fullUrl}`);
+                }}
             >
                 Show Details
             </button>
