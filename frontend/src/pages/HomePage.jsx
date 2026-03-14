@@ -14,8 +14,17 @@ function HomePage() {
   if (error) {
     console.error("HomePage Error:", error);
     return (
-      <div role="alert" className="alert alert-error">
-        <span>Something went wrong fetching products. Please check your connection and refresh.</span>
+      <div role="alert" className="alert alert-error flex-col items-start gap-2">
+        <div className="flex items-center gap-2">
+            <span>Something went wrong fetching products.</span>
+            <button 
+                className="btn btn-xs btn-outline"
+                onClick={() => alert(`Error: ${error.message}\nStatus: ${error.response?.status}\nURL: ${error.config?.url}`)}
+            >
+                Show Details
+            </button>
+        </div>
+        <span className="text-xs opacity-70">Please check your connection and refresh.</span>
       </div>
     );
   }

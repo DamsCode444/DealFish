@@ -10,7 +10,7 @@ import uploadRoutes from "./routes/uploadRoutes";
 
 const app = express();
 
-const corsOptions = {
+const corsOptions: cors.CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = [
       "http://localhost:5173",
@@ -19,15 +19,21 @@ const corsOptions = {
       ENV.FRONTEND_URL
     ].filter(Boolean);
     
-    if (!origin || allowedOrigins.includes(origin)) {
+    // In production, allow any subdomain of onrender.com
+    const isRenderSubdomain = origin && origin.endsWith(".onrender.com");
+
+    if (!origin || allowedOrigins.includes(origin) || isRenderSubdomain) {
       callback(null, true);
     } else {
+      console.warn(`[CORS] Rejected origin: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     }
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 // Request logging middleware
@@ -38,15 +44,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Apply CORS globally (this attaches the CORS response headers)
 app.use(cors(corsOptions));
-
-// Optional: explicitly handle preflight after cors middleware so headers are present
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.method === "OPTIONS") {
-    // cors() already added the required headers, so respond
-    return res.sendStatus(204);
-  }
-  next();
-});
 
 // Body parsers
 app.use(express.json());
