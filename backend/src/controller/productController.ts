@@ -6,7 +6,15 @@ import { getAuth } from "@clerk/express"
 //get all products(public)
 export const getAllProducts = async (req:Request,res:Response) => {
     try {
-        const products = await queries.getAllProducts()
+        const { search } = req.query;
+        let products;
+        
+        if (search && typeof search === "string") {
+            products = await queries.searchProducts(search);
+        } else {
+            products = await queries.getAllProducts();
+        }
+
         res.status(200).json({success:true,message:"Products retrieved successfully",data:products})
     } catch (error) {
         console.error("Error fetching products:", error)

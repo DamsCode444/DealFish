@@ -10,8 +10,11 @@ import {
   uploadImages,
 } from "../lib/api";
 
-export const useProducts = () => {
-  const result = useQuery({ queryKey: ["products"], queryFn: getAllProducts });
+export const useProducts = (search = "") => {
+  const result = useQuery({ 
+    queryKey: ["products", search], 
+    queryFn: () => getAllProducts(search) 
+  });
 
   return {
     ...result,
