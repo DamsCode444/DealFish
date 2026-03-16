@@ -1,14 +1,19 @@
 import Navbar from './components/Navbar'
-import  HomePage  from './pages/HomePage'
-import  ProductPage  from './pages/ProductPage'
-import  ProfilePage  from './pages/ProfilePage'
-import  CreatePage  from './pages/CreatePage'
-import  EditProductPage  from './pages/EditProductPage'
-import  {Routes, Route, Navigate } from 'react-router'
+import HomePage from './pages/HomePage'
+import ProductPage from './pages/ProductPage'
+import ProfilePage from './pages/ProfilePage'
+import CreatePage from './pages/CreatePage'
+import EditProductPage from './pages/EditProductPage'
+import CartPage from './pages/CartPage'
+import SuccessPage from './pages/SuccessPage'
+import CancelPage from './pages/CancelPage'
+import { Routes, Route, Navigate } from 'react-router'
 import useAuthReq from './hooks/useAuthReq'
 import useUserSync from './hooks/useUserSync'
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorBoundary from './components/ErrorBoundary';
+import MyPurchasesPage from './pages/MyPurchasesPage'
+import SellerDashboardPage from './pages/SellerDashboardPage'
 
 
 function App() {
@@ -21,19 +26,24 @@ function App() {
   return (
     <ErrorBoundary>
       <div className='min-h-screen bg-base-100'>
-    <Navbar />
-    <main className='max-w-5xl mx-auto px-4 py-8'>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/product/:id" element={isSignedIn ? <ProductPage /> : <Navigate to="/" />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/create" element={isSignedIn ? <CreatePage /> :<>
+        <Navbar />
+        <main className='max-w-5xl mx-auto px-4 py-8'>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/product/:id" element={isSignedIn ? <ProductPage /> : <Navigate to="/" />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/create" element={isSignedIn ? <CreatePage /> : <>
               <p>You must be signed in to create a product</p>
               <Navigate to="/" />
-          </> } />
-          <Route path="/edit/:id" element={<EditProductPage />} />
-        </Routes>
-    </main>
+            </>} />
+            <Route path="/edit/:id" element={<EditProductPage />} />
+            <Route path="/cart" element={isSignedIn ? <CartPage /> : <Navigate to="/" />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/cancel" element={<CancelPage />} />
+            <Route path="/purchases" element={<MyPurchasesPage />} />
+            <Route path="/dashboard" element={<SellerDashboardPage />} />
+          </Routes>
+        </main>
       </div>
     </ErrorBoundary>
   )

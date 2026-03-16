@@ -1,0 +1,56 @@
+[2026-03-16T02:51:09.613Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T02:55:40.316Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T03:09:55.720Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T03:23:49.265Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T03:26:06.278Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T03:28:24.414Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T03:29:14.868Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥20 converts to approximately د.إ0.46.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥20 converts to approximately د.إ0.46.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[2026-03-16T03:43:54.633Z] POST /api/payment/create-checkout-session
+Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+Stack: Error: The Checkout Session's total amount must convert to at least 200 fils. ¥30 converts to approximately د.إ0.69.
+    at generateV1Error (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\Error.js:11:20)
+    at res.toJSON.then.Error_js_1.StripeAPIError.message (C:\Users\Damodar Vaidik\Desktop\Productify\backend\node_modules\stripe\cjs\RequestSender.js:114:62)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+

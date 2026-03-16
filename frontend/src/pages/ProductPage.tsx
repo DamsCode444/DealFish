@@ -10,12 +10,14 @@ import {
   XIcon,
   ZoomInIcon,
   ZoomOutIcon,
-  RotateCcwIcon
+  RotateCcwIcon,
+  ShoppingCartIcon
 } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import CommentsSection from "../components/CommentsSection";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, SignInButton } from "@clerk/clerk-react";
 import { useProduct, useDeleteProduct } from "../hooks/useProducts";
+import { useCart, useAddToCart } from "../hooks/useCart";
 import { useParams, Link, useNavigate } from "react-router";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,6 +35,10 @@ function ProductPage() {
 
   const { data: product, isLoading, error } = useProduct(id);
   const deleteProduct = useDeleteProduct();
+  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+  const { data: cartData } = useCart();
+
+  const isInCart = cartData?.data?.some((item: any) => item.productId === product?.id);
 
   const handleDelete = () => {
     if (confirm("Delete this product permanently?")) {
@@ -96,6 +102,13 @@ function ProductPage() {
   }
 
   const isOwner = userId === product.userId;
+
+  const CURRENCY_SYMBOLS: Record<string, string> = {
+    CNY: "¥",
+    JPY: "¥",
+    USD: "$",
+    EUR: "€",
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -217,7 +230,8 @@ function ProductPage() {
             <div className="flex justify-between items-start gap-2">
                 <h1 className="card-title text-3xl font-bold leading-tight">{product.title}</h1>
                 <div className="badge badge-primary badge-lg p-4 font-bold text-lg whitespace-nowrap">
-                   ¥{product.price}
+                   {CURRENCY_SYMBOLS[product.currency] || ""} {product.price}
+                   {!CURRENCY_SYMBOLS[product.currency] && <span className="text-xs ml-1">{product.currency}</span>}
                 </div>
             </div>
 
@@ -237,6 +251,36 @@ function ProductPage() {
             <div className="prose prose-sm max-w-none text-base-content/80">
                 <p className="whitespace-pre-wrap leading-relaxed text-lg">{product.description}</p>
             </div>
+
+            {!isOwner && (
+              <div className="mt-8">
+                {!userId ? (
+                  <SignInButton mode="modal">
+                    <button className="btn btn-primary w-full gap-2">
+                       <ShoppingCartIcon className="size-5" /> Add to Cart
+                    </button>
+                  </SignInButton>
+                ) : (
+                  <button 
+                    onClick={() => addToCart({ productId: product.id })}
+                    disabled={isAddingToCart || isInCart}
+                    className={`btn btn-primary w-full gap-2 ${isInCart ? 'btn-outline' : ''}`}
+                  >
+                    {isAddingToCart ? (
+                      <span className="loading loading-spinner loading-xs" />
+                    ) : (
+                      <ShoppingCartIcon className="size-5" />
+                    )}
+                    {isInCart ? "Already in Cart" : "Add to Cart"}
+                  </button>
+                )}
+                {isInCart && (
+                   <Link to="/cart" className="btn btn-ghost w-full btn-sm mt-2 text-primary">
+                      View in Cart
+                   </Link>
+                )}
+              </div>
+            )}
 
             {product.user && (
               <>

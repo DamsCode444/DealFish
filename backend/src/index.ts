@@ -1,12 +1,17 @@
 import express, { Request, Response, NextFunction } from "express";
 import { ENV } from "./config/env";
 import cors from "cors";
+import fs from "fs";
 import { clerkMiddleware } from '@clerk/express';
 import path from "path";
 import userRoutes from "./routes/userRoutes";
 import productRoutes from "./routes/productRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
+import cartRoutes from "./routes/cartRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
+import * as paymentController from "./controller/paymentController";
+import orderRoutes from "./routes/orderRoutes";
 
 const app = express();
 
@@ -45,9 +50,26 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Apply CORS globally (this attaches the CORS response headers)
 app.use(cors(corsOptions));
 
-// Body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Webhook route needs raw body for Stripe signature verification
+// Map both potential URLs for robustness
+app.post("/api/payment/webhook", express.raw({ type: "application/json" }), paymentController.handleWebhook);
+app.post("/stripe-webhook", express.raw({ type: "application/json" }), paymentController.handleWebhook);
+
+// Body parsers (skip for webhook)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.originalUrl === "/api/payment/webhook" || req.originalUrl === "/stripe-webhook") {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
+app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.originalUrl === "/api/payment/webhook" || req.originalUrl === "/stripe-webhook") {
+      next();
+    } else {
+      express.urlencoded({ extended: true })(req, res, next);
+    }
+});
 
 // Clerk middleware after CORS
 app.use(clerkMiddleware());
@@ -62,6 +84,26 @@ app.use("/api/product", productRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/orders", orderRoutes);
+
+// Global Error Handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  const errorLog = `[${new Date().toISOString()}] ERROR: ${err.message}\nStack: ${err.stack}\nURL: ${req.originalUrl}\n\n`;
+  try {
+    fs.appendFileSync(path.join(process.cwd(), "errors.log"), errorLog);
+  } catch (e) {
+    console.error("Failed to write to error log:", e);
+  }
+
+  console.error("[Global Error Handler]:", err);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    stack: ENV.NODE_ENV === "development" ? err.stack : undefined
+  });
+});
 
 // Serve frontend in production
 const nodeEnv = ENV.NODE_ENV || process.env.NODE_ENV || "development";
