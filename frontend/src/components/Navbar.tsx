@@ -1,10 +1,13 @@
 import { Link } from "react-router";
 import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/clerk-react";
-import { ShoppingBagIcon, PlusIcon, UserIcon } from "lucide-react";
+import { ShoppingBagIcon, PlusIcon, UserIcon, ShoppingCartIcon, LayoutDashboardIcon } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
+import { useCart } from "../hooks/useCart";
 
 function Navbar() {
   const { isSignedIn } = useAuth();
+  const { data: cartData } = useCart();
+  const cartItemsCount = cartData?.data?.length || 0;
 
   return (
     <div className="navbar bg-base-300">
@@ -19,11 +22,31 @@ function Navbar() {
 
         <div className="flex gap-2 items-center">
           <ThemeSelector />
+          
+          {isSignedIn && (
+            <Link to="/cart" className="btn btn-ghost btn-circle btn-sm relative mr-1">
+              <ShoppingCartIcon className="size-5" />
+              {cartItemsCount > 0 && (
+                <span className="badge badge-primary badge-xs absolute -top-1 -right-1">
+                  {cartItemsCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {isSignedIn ? (
             <>
               <Link to="/create" className="btn btn-primary btn-sm gap-1">
                 <PlusIcon className="size-4" />
                 <span className="hidden sm:inline">New Product</span>
+              </Link>
+              <Link to="/dashboard" className="btn btn-ghost btn-sm gap-1">
+                <LayoutDashboardIcon className="size-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Link>
+              <Link to="/purchases" className="btn btn-ghost btn-sm gap-1">
+                <ShoppingBagIcon className="size-4" />
+                <span className="hidden sm:inline">My Purchases</span>
               </Link>
               <Link to="/profile" className="btn btn-ghost btn-sm gap-1">
                 <UserIcon className="size-4" />

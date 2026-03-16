@@ -1,10 +1,10 @@
-import type {Request,Response} from "express"
+import type {Request,Response,NextFunction} from "express"
 import * as queries from "../db/queries"
 import { getAuth } from "@clerk/express"
 
 
 //get all products(public)
-export const getAllProducts = async (req:Request,res:Response) => {
+export const getAllProducts = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const { search } = req.query;
         let products;
@@ -17,26 +17,24 @@ export const getAllProducts = async (req:Request,res:Response) => {
 
         res.status(200).json({success:true,message:"Products retrieved successfully",data:products})
     } catch (error) {
-        console.error("Error fetching products:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+        next(error)
     }   
 }
 
 //get product by current user(protected)
-export const getProductsByCurrentUser = async (req:Request,res:Response) => {
+export const getProductsByCurrentUser = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {userId} = getAuth(req)
         if(!userId) return res.status(401).json({success:false,message:"Unauthorized"})
         const products = await queries.getProductsByUserId(userId)
         res.status(200).json({success:true,message:"Products retrieved successfully",data:products})
     } catch (error) {
-        console.error("Error fetching products:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+        next(error)
     }
 }
 
 //get single product by id(public)
-export const getProductById = async (req:Request,res:Response) => {
+export const getProductById = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {id} = req.params
         const idString = Array.isArray(id) ? id[0] : id
@@ -44,14 +42,13 @@ export const getProductById = async (req:Request,res:Response) => {
         if(!product) return res.status(404).json({success:false,message:"Product not found"})
         res.status(200).json({success:true,message:"Product retrieved successfully",data:product})
     } catch (error) {
-        console.error("Error fetching product:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+        next(error)
     }
 }
 
 
 //create product(protected)
-export const createProduct = async (req:Request,res:Response) => {
+export const createProduct = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {userId} = getAuth(req)
         if(!userId) return res.status(401).json({success:false,message:"Unauthorized"})
@@ -66,14 +63,13 @@ export const createProduct = async (req:Request,res:Response) => {
         })
         res.status(201).json({success:true,message:"Product created successfully",data:newProduct})
     } catch (error) {
-        console.error("Error creating product:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+        next(error)
     }
 }
 
 
 //Update product(protected)(owner only)
-export const updateProduct = async (req:Request,res:Response) => {
+export const updateProduct = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {userId} = getAuth(req)
         if(!userId) return res.status(401).json({success:false,message:"Unauthorized"})
@@ -91,14 +87,13 @@ export const updateProduct = async (req:Request,res:Response) => {
             price
         })
         res.status(200).json({success:true,message:"Product updated successfully",data:updatedProduct})
-    }   catch (error) {
-        console.error("Error updating product:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+    } catch (error) {
+        next(error)
     }
 }
 
 //Delete product(protected)(owner only)
-export const deleteProduct = async (req:Request,res:Response) => {
+export const deleteProduct = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {userId} = getAuth(req)
         if(!userId) return res.status(401).json({success:false,message:"Unauthorized"})
@@ -113,7 +108,6 @@ export const deleteProduct = async (req:Request,res:Response) => {
         await queries.deleteProduct(idString)
         res.status(200).json({success:true,message:"Product deleted successfully"})
     } catch (error) {
-        console.error("Error deleting product:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+        next(error)
     }
 }

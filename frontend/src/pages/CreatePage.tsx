@@ -8,9 +8,16 @@ function CreatePage() {
   const createProduct = useCreateProduct();
   const uploadImages = useUploadImages();
   
-  const [formData, setFormData] = useState({ title: "", description: "", price: "" });
+  const [formData, setFormData] = useState({ title: "", description: "", price: "", currency: "CNY" });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+
+  const CURRENCY_SYMBOLS: Record<string, string> = {
+    CNY: "¥",
+    JPY: "¥",
+    USD: "$",
+    EUR: "€",
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -127,20 +134,34 @@ function CreatePage() {
                 />
               </div>
             </div>
-            {/* PRICE INPUT */}
-            <label className="input input-bordered flex items-center gap-2 bg-base-200">
-              <span className="text-base-content/50">¥</span>
-              <input
-                type="number"
-                placeholder="Price"
-                className="grow"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                required
-                min="0"
-                step="5"
-              />
-            </label>
+
+            {/* CURRENCY & PRICE */}
+            <div className="grid grid-cols-3 gap-2">
+              <select 
+                className="select select-bordered bg-base-200 col-span-1"
+                value={formData.currency}
+                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+              >
+                <option value="CNY">CNY (元)</option>
+                <option value="USD">USD ($)</option>
+                <option value="JPY">JPY (¥)</option>
+                <option value="EUR">EUR (€)</option>
+              </select>
+
+              <label className="input input-bordered flex items-center gap-2 bg-base-200 col-span-2">
+                <span className="text-base-content/50 font-bold">{CURRENCY_SYMBOLS[formData.currency]}</span>
+                <input
+                  type="number"
+                  placeholder="Price"
+                  className="grow"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  required
+                  min="0"
+                  step="0.01"
+                />
+              </label>
+            </div>
 
             {(createProduct.isError || uploadImages.isError) && (
               <div role="alert" className="alert alert-error alert-sm">

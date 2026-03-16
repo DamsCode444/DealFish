@@ -8,6 +8,13 @@ const ProductCard = ({ product }) => {
   const isNew = new Date(product.createdAt) > oneWeekAgo;
   const { isSignedIn } = useAuth();
 
+  const CURRENCY_SYMBOLS = {
+    CNY: "¥",
+    JPY: "¥",
+    USD: "$",
+    EUR: "€",
+  };
+
   const CardContent = (
     <div className="card bg-base-300 hover:bg-base-200 transition-all hover:-translate-y-1 h-full shadow-lg">
       <figure className="px-4 pt-4">
@@ -24,7 +31,10 @@ const ProductCard = ({ product }) => {
           </h2>
           {isNew && <span className="badge badge-secondary badge-sm shrink-0">NEW</span>}
         </div>
-        <span className="text-xl font-bold text-primary"> ¥{product.price}</span>
+        <span className="text-xl font-bold text-primary"> 
+          {CURRENCY_SYMBOLS[product.currency] || ""} {product.price}
+          {!CURRENCY_SYMBOLS[product.currency] && <span className="text-xs ml-1">{product.currency}</span>}
+        </span>
         <p className="text-sm text-base-content/70 line-clamp-2 min-h-[2.5rem]">{product.description}</p>
 
         <div className="divider my-1"></div>

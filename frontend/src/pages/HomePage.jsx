@@ -91,7 +91,7 @@ function HomePage() {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="sticky top-20 z-10 bg-base-100/80 backdrop-blur-md py-4 mb-8">
+      <div className="sticky top-0 z-20 bg-base-100/95 backdrop-blur-md py-4 mb-8 -mx-4 px-4 border-b border-base-content/5">
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="flex items-center gap-3">
              <h2 className="text-2xl font-bold">Featured Products</h2>

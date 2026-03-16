@@ -1,9 +1,9 @@
-import type {Request,Response} from "express"
+import type {Request,Response,NextFunction} from "express"
 import * as queries from "../db/queries"
 import { getAuth } from "@clerk/express"
 
 
-export async function syncUser(req:Request,res:Response){
+export async function syncUser(req:Request,res:Response,next:NextFunction){
 
     try {
         const {userId} = getAuth(req)
@@ -21,8 +21,7 @@ export async function syncUser(req:Request,res:Response){
         })
         res.status(200).json({success:true,message:"User synced successfully",data:user})
     } catch (error) {
-        console.error("Error syncing user:", error)
-        return res.status(500).json({success:false,message:"Internal Server Error"})
+        next(error)
     }
 
 }

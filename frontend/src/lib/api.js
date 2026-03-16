@@ -54,3 +54,37 @@ export const deleteComment = async ({ commentId }) => {
   const { data } = await api.delete(`/comments/${commentId}`);
   return data;
 };
+
+// Cart API
+export const getCart = async () => {
+  const { data } = await api.get("/cart");
+  return data;
+};
+
+export const addToCart = async ({ productId, quantity = 1 }) => {
+  const { data } = await api.post("/cart", { productId, quantity });
+  return data;
+};
+
+export const updateCartItem = async ({ id, quantity }) => {
+  const { data } = await api.patch(`/cart/${id}`, { quantity });
+  return data;
+};
+
+export const removeFromCart = async (id) => {
+  const { data } = await api.delete(`/cart/${id}`);
+  return data;
+};
+
+// Payment API
+export const createCheckoutSession = async () => {
+    const { data } = await api.post("/payment/create-checkout-session");
+    return data;
+};
+
+// Order API
+export const getOrders = () => api.get("/orders");
+export const getSellerOrders = () => api.get("/orders/seller");
+export const createOrderFromCart = () => api.post("/orders/create-from-cart");
+export const updateOrderItemStatus = ({ id, status }) => api.patch(`/orders/item/${id}/status`, { status });
+export const confirmReceipt = (id) => api.patch(`/orders/item/${id}/confirm`);
