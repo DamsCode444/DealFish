@@ -32,6 +32,7 @@ export const createCheckoutSession = async (req: Request, res: Response, next: N
 
         // Use the currency of the first product (Stripe sessions must be single-currency)
         const currency = (cartItems[0].product?.currency || "CNY").toUpperCase();
+        const isZeroDecimal = ["JPY", "KRW", "VND"].includes(currency);
 
         const lineItems = cartItems.map((item: any) => {
             if (!item.product) {
@@ -62,11 +63,13 @@ export const createCheckoutSession = async (req: Request, res: Response, next: N
                 }
             }
 
+            const unitAmount = isZeroDecimal ? Math.round(price) : Math.round(price * 100);
+
             return {
                 price_data: {
                     currency: currency.toLowerCase(),
                     product_data: productData,
-                    unit_amount: Math.round(price),
+                    unit_amount: unitAmount,
                 },
                 quantity: item.quantity,
             };
@@ -91,7 +94,7 @@ export const createCheckoutSession = async (req: Request, res: Response, next: N
             success_url: `${ENV.FRONTEND_URL}/success`,
             cancel_url: `${ENV.FRONTEND_URL}/cart`,
             shipping_address_collection: {
-                allowed_countries: ["AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CV", "CW", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "XK", "YE", "YT", "ZA", "ZM", "ZW"],
+                allowed_countries: ["US", "CA", "CN", "HK", "JP", "GB", "AU", "DE", "FR", "IN", "SG"], // Limit to major countries to avoid API limits
             },
             billing_address_collection: "required",
             metadata: {
@@ -106,12 +109,17 @@ export const createCheckoutSession = async (req: Request, res: Response, next: N
 
         res.status(200).json({ success: true, url: session.url });
     } catch (error: any) {
-        console.error("[PaymentController] Error in createCheckoutSession:", {
-            error: error.message,
-            stack: error.stack,
-            userId: getAuth(req).userId
+        console.error("[PaymentController] CRITICAL ERROR In createCheckoutSession:", {
+            errorMessage: error.message,
+            errorObject: error,
+            userId: getAuth(req).userId,
+            stack: error.stack
         });
-        next(error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error during payment processing",
+            details: error.message 
+        });
     }
 };
 
