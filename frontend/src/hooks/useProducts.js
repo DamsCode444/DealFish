@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createProduct,
@@ -10,16 +10,19 @@ import {
   uploadImages,
 } from "../lib/api";
 
-export const useProducts = (search = "") => {
-  const result = useQuery({ 
-    queryKey: ["products", search], 
-    queryFn: () => getAllProducts(search) 
-  });
+export const useProducts = (params = {}) => {
+  const { search = "", category = "All" } = params;
 
-  return {
-    ...result,
-    data: result.data?.data || [],
-  };
+  return useInfiniteQuery({
+    queryKey: ["products", search, category],
+    queryFn: ({ pageParam = 1 }) => getAllProducts({ search, category, page: pageParam, limit: 10 }),
+    getNextPageParam: (lastPage) => {
+      const { page, limit } = lastPage.pagination;
+      // If the number of items returned is equal to the limit, there might be more
+      return lastPage.data.length === limit ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
 };
 
 export const useCreateProduct = () => {

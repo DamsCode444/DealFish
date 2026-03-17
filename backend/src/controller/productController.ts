@@ -6,16 +6,34 @@ import { getAuth } from "@clerk/express"
 //get all products(public)
 export const getAllProducts = async (req:Request,res:Response,next:NextFunction) => {
     try {
-        const { search } = req.query;
+        const { search, category, page = "1", limit = "10" } = req.query;
+        const pageNum = parseInt(page as string) || 1;
+        const limitNum = parseInt(limit as string) || 10;
+        const offset = (pageNum - 1) * limitNum;
+
         let products;
         
+        const options = {
+            category: category as string,
+            limit: limitNum,
+            offset: offset
+        };
+
         if (search && typeof search === "string") {
-            products = await queries.searchProducts(search);
+            products = await queries.searchProducts(search, options);
         } else {
-            products = await queries.getAllProducts();
+            products = await queries.getAllProducts(options);
         }
 
-        res.status(200).json({success:true,message:"Products retrieved successfully",data:products})
+        res.status(200).json({
+            success: true, 
+            message: "Products retrieved successfully", 
+            data: products,
+            pagination: {
+                page: pageNum,
+                limit: limitNum
+            }
+        })
     } catch (error) {
         next(error)
     }   
@@ -52,13 +70,14 @@ export const createProduct = async (req:Request,res:Response,next:NextFunction) 
     try {
         const {userId} = getAuth(req)
         if(!userId) return res.status(401).json({success:false,message:"Unauthorized"})
-        const {title,description,imageUrls,price} = req.body
+        const {title,description,imageUrls,price,category} = req.body
         if(!title || !description || !price) return res.status(400).json({success:false,message:"Title, description, and price are required"})
         const newProduct = await queries.createProduct({
             title,
             description,
             imageUrls,
             price,
+            category: category || "Electronics",
             userId
         })
         res.status(201).json({success:true,message:"Product created successfully",data:newProduct})
@@ -78,13 +97,14 @@ export const updateProduct = async (req:Request,res:Response,next:NextFunction) 
         const existingProduct = await queries.getProductById(idString)
         if(!existingProduct) return res.status(404).json({success:false,message:"Product not found"})
         if(existingProduct.userId !== userId) return res.status(403).json({success:false,message:"Forbidden"})
-        const {title,description,imageUrls,price} = req.body
+        const {title,description,imageUrls,price,category} = req.body
         if(!title || !description || !price) return res.status(400).json({success:false,message:"Title, description, and price are required"})
         const updatedProduct = await queries.updateProduct(idString,{
             title,
             description,
             imageUrls,
-            price
+            price,
+            category: category || existingProduct.category
         })
         res.status(200).json({success:true,message:"Product updated successfully",data:updatedProduct})
     } catch (error) {

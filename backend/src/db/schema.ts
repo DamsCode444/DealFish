@@ -17,6 +17,7 @@ export const products = pgTable("products", {
     imageUrls: text("image_urls").array().notNull().default([]),
     currency: text("currency").notNull().default("CNY"),
     price: text("price").notNull(),
+    category: text("category").notNull().default("Electronics"),
     userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),

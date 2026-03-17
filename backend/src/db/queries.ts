@@ -47,21 +47,37 @@ export const createProduct = async (data: NewProduct) => {
     return product;
 }
 
-export const getAllProducts = async () => {
+export const getAllProducts = async (options: { category?: string, limit?: number, offset?: number } = {}) => {
+    const { category, limit = 10, offset = 0 } = options;
+    
+    const whereClause = category && category !== "All" ? eq(products.category, category) : undefined;
+
     return db.query.products.findMany({
+        where: whereClause,
         with: { user: true },
-        orderBy: (products, { desc }) => [desc(products.createdAt)]//desc means descending order, so the most recently created products will be returned first.
-        //square brackets are used to return an array of products, even if there is only one product that matches the query.
+        limit: limit,
+        offset: offset,
+        orderBy: (products, { desc }) => [desc(products.createdAt)]
     });
 }
 
-export const searchProducts = async (query: string) => {
+export const searchProducts = async (query: string, options: { category?: string, limit?: number, offset?: number } = {}) => {
+    const { category, limit = 10, offset = 0 } = options;
+
+    const baseFilter = or(
+        ilike(products.title, `%${query}%`),
+        ilike(products.description, `%${query}%`)
+    );
+
+    const whereClause = category && category !== "All" 
+        ? and(baseFilter, eq(products.category, category))
+        : baseFilter;
+
     return db.query.products.findMany({
-        where: or(
-            ilike(products.title, `%${query}%`),
-            ilike(products.description, `%${query}%`)
-        ),
+        where: whereClause,
         with: { user: true },
+        limit: limit,
+        offset: offset,
         orderBy: (products, { desc }) => [desc(products.createdAt)]
     });
 }

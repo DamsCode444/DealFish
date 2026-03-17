@@ -1,56 +1,59 @@
 import { useProducts } from "../hooks/useProducts";
-import { PackageIcon, SparklesIcon, ShoppingBagIcon, SearchIcon, XIcon } from "lucide-react";
+import { PackageIcon, SparklesIcon, ShoppingBagIcon, SearchIcon, XIcon, Loader2Icon } from "lucide-react";
 import { Link } from "react-router";
-import HomePageSkelaton from "../components/HomePageSkelaton";
 import ProductGridSkeleton from "../components/ProductGridSkeleton";
 import ProductCard from "../components/ProductCard";
-import { SignInButton, SignOutButton, useAuth } from "@clerk/clerk-react";
-import { useState, useEffect } from "react";
+import CategoryFilter from "../components/CategoryFilter";
+import { SignInButton, useAuth } from "@clerk/clerk-react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const { data: products, isLoading, isError, error, isFetching } = useProducts(debouncedSearch);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  
+  const { 
+    data, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage, 
+    status,
+    isError,
+    error,
+    isFetching
+  } = useProducts({ search: debouncedSearch, category: selectedCategory });
+
   const { isSignedIn } = useAuth();
+  const observerRef = useRef();
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Handle errors specifically
+  const lastElementRef = useCallback(node => {
+    if (isFetchingNextPage) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+    
+    if (node) observerRef.current.observe(node);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+
   if (isError) {
-    console.error("HomePage Error:", error);
     return (
       <div role="alert" className="alert alert-error flex-col items-start gap-2">
-        <div className="flex items-center gap-2">
-            <span>Something went wrong fetching products.</span>
-            <button 
-                className="btn btn-xs btn-outline"
-                onClick={() => {
-                    const fullUrl = error.config?.baseURL 
-                        ? (error.config.baseURL.replace(/\/$/, '') + '/' + error.config.url.replace(/^\//, ''))
-                        : error.config?.url;
-                    alert(`Error: ${error.message}\nStatus: ${error.response?.status}\nURL: ${fullUrl}`);
-                }}
-            >
-                Show Details
-            </button>
-        </div>
-        <span className="text-xs opacity-70">Please check your connection and refresh.</span>
+        <span>Something went wrong fetching products.</span>
+        <span className="text-xs opacity-70">{error.message}</span>
       </div>
     );
   }
 
-  // Defensive check for products array
-  if (!Array.isArray(products)) {
-    console.error("Products is not an array:", products);
-    return (
-      <div role="alert" className="alert alert-warning">
-        <span>Unable to load product list. Please try again later.</span>
-      </div>
-    );
-  }
+  const allProducts = data?.pages.flatMap(page => page.data) || [];
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -91,13 +94,13 @@ function HomePage() {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="sticky top-0 z-20 bg-base-100/95 backdrop-blur-md py-4 mb-8 -mx-4 px-4 border-b border-base-content/5">
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="sticky top-0 z-20 bg-base-100/95 backdrop-blur-md py-4 mb-4 -mx-4 px-4 border-b border-base-content/5">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="flex items-center gap-3">
              <h2 className="text-2xl font-bold">Featured Products</h2>
-             {isFetching && <span className="loading loading-spinner loading-xs text-primary" />}
+             {isFetching && !isFetchingNextPage && <span className="loading loading-spinner loading-xs text-primary" />}
           </div>
-          <div className="relative w-full sm:w-96">
+          <div className="relative w-full md:w-96">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-base-content/40" />
             <input 
               type="text" 
@@ -118,33 +121,63 @@ function HomePage() {
         </div>
       </div>
 
+      <CategoryFilter 
+        selectedCategory={selectedCategory} 
+        onSelectCategory={(cat) => setSelectedCategory(cat)} 
+      />
+
       {/* PRODUCTS */}
       <div>
         <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
           <PackageIcon className="size-5 text-primary" />
-          All Products
+          {selectedCategory === "All" ? "All Products" : `${selectedCategory} category`}
         </h2>
 
-        <div className={`transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
-          {isLoading ? (
+        <div className={`transition-opacity duration-300 ${isFetching && !isFetchingNextPage ? 'opacity-50' : 'opacity-100'}`}>
+          {status === "pending" ? (
             <ProductGridSkeleton />
-          ) : products.length === 0 ? (
+          ) : allProducts.length === 0 ? (
             <div className="card bg-base-300">
               <div className="card-body items-center text-center py-16">
                 <PackageIcon className="size-16 text-base-content/20" />
                 <h3 className="card-title text-base-content/50">No products found</h3>
-                <p className="text-base-content/40 text-sm">Try a different search term or check back later!</p>
+                <p className="text-base-content/40 text-sm">Try a different filter or search term!</p>
                 <Link to="/create" className="btn btn-primary btn-sm mt-2">
                   Create Product
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {allProducts.map((product, index) => {
+                  if (allProducts.length === index + 1) {
+                    return (
+                      <div ref={lastElementRef} key={product.id}>
+                        <ProductCard product={product} />
+                      </div>
+                    );
+                  } else {
+                    return <ProductCard key={product.id} product={product} />;
+                  }
+                })}
+              </div>
+              
+              {isFetchingNextPage && (
+                <div className="flex justify-center py-12">
+                   <div className="flex items-center gap-3 text-primary font-medium">
+                      <Loader2Icon className="size-6 animate-spin" />
+                      Loading more products...
+                   </div>
+                </div>
+              )}
+              
+              {!hasNextPage && allProducts.length > 0 && (
+                <div className="text-center py-12 text-base-content/30 italic">
+                   You've reached the end of the collection
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

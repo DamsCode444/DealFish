@@ -7,8 +7,16 @@ export const syncUser = async (userData) => {
 };
 
 // Products API
-export const getAllProducts = async (search = "") => {
-  const { data } = await api.get(`/products${search ? `?search=${search}` : ""}`);
+export const getAllProducts = async (params = {}) => {
+  const { search = "", category = "", page = 1, limit = 10 } = params;
+  const queryParams = new URLSearchParams();
+  
+  if (search) queryParams.append("search", search);
+  if (category && category !== "All") queryParams.append("category", category);
+  queryParams.append("page", page);
+  queryParams.append("limit", limit);
+
+  const { data } = await api.get(`/products?${queryParams.toString()}`);
   return data;
 };
 
